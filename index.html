@@ -1,14 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="style.css"> <!-- Link to your CSS file -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olios Foods | Bringing the Heat to Every Bite!</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      background-color: #ff3c00;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+    header p {
+      margin: 5px 0 0;
+      font-size: 1.2em;
+    }
+    .hero {
+      background: url('https://images.unsplash.com/photo-1603048306421-01225f7f5e94?auto=format&fit=crop&w=1400&q=80') center/cover;
+      color: white;
+      text-align: center;
+      padding: 100px 20px;
+    }
+    .hero h2 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 1.1em;
+    }
+    section {
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background-color: #fff3e0;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+    }
+    .product h3 {
+      color: #ff3c00;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    a {
+      color: #ff3c00;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is my first page!</p>
-    <script src="script.js"></script> <!-- Link to your JavaScript file -->
+
+  <header>
+    <h1>Olios Foods</h1>
+    <p>Bringing the Heat to Every Bite!</p>
+  </header>
+
+  <div class="hero">
+    <h2>Welcome to Olios Foods</h2>
+    <p>Discover bold, flavorful spicy recipes and sauces that ignite your taste buds.</p>
+  </div>
+
+  <section>
+    <h2>🔥 Our Products</h2>
+    <div class="products">
+      <div class="product">
+        <h3>Olios Hot Sauce</h3>
+        <p>A perfect blend of heat and flavor — handcrafted for spice lovers.</p>
+      </div>
+      <div class="product">
+        <h3>Spicy Mix Seasoning</h3>
+        <p>Sprinkle it on anything for an instant kick of Olios magic!</p>
+      </div>
+      <div class="product">
+        <h3>Chili Pepper Paste</h3>
+        <p>Rich, authentic, and fiery — the taste that defines Olios Foods.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>🌶️ About Us</h2>
+    <p>Olios Foods is all about passion, flavor, and fire! We create authentic spicy sauces and seasonings that bring joy to every meal. From our kitchen to yours — taste the Olios difference.</p>
+  </section>
+
+  <section>
+    <h2>📞 Contact Us</h2>
+    <p>WhatsApp: <a href="#">+260 XXX XXX XXX</a></p>
+    <p>Email: <a href="#">contact@oliosfoods.com</a></p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Olios Foods. All Rights Reserved.</p>
+  </footer>
+
 </body>
 </html>
