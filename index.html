@@ -109,7 +109,7 @@
 
   <section>
     <h2>📞 Contact Us</h2>
-    <p>WhatsApp: <a href="#">+260 XXX XXX XXX</a></p>
+    <p>WhatsApp: <a href="#"> window.open(`https://wa.me/260976985015?text=${message}`, "_blank");
     <p>Email: <a href="#">contact@oliosfoods.com</a></p>
   </section>
 
@@ -119,3 +119,148 @@
 
 </body>
 </html>
+<!-- START: Olios simple cart (paste before </body>) -->
+<style>
+  /* Cart UI styles */
+  #cart-button { position: fixed; right: 18px; bottom: 18px; background:#e63946;color:#fff;border-radius:40px;padding:10px 14px;box-shadow:0 6px 14px rgba(0,0,0,.15);cursor:pointer;z-index:9999;font-weight:600; }
+  #cart-count { background:#111;color:#fff;border-radius:50%;padding:2px 7px;margin-left:8px;font-weight:700;font-size:.85rem; }
+  #cart-panel { position: fixed; right: 18px; bottom: 72px; width: 360px; max-width:92%; background:#fff;border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,.18); padding:14px; display:none; z-index:9999; }
+  #cart-panel h3{ margin:0 0 8px; font-size:1.05rem; }
+  .cart-item{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:.95rem; }
+  .cart-actions{ display:flex; gap:8px; margin-top:12px; }
+  .cart-actions button{ flex:1; padding:10px; border:0; border-radius:8px; cursor:pointer; font-weight:600; }
+  .btn-whatsapp{ background:#25D366; color:#fff; }
+  .btn-paypal{ background:#003087; color:#fff; }
+  .btn-clear{ background:#f0f0f0; color:#333; }
+  @media (max-width:420px){ #cart-panel{ right:10px; left:10px; width:auto; } }
+</style>
+
+<div id="cart-button">Cart <span id="cart-count">0</span></div>
+<div id="cart-panel" aria-hidden="true"></div>
+
+<script>
+(function(){
+  // ====== CONFIG - replace these ======
+  const sellerPhone = '260XXXXXXXXX'; // REQUIRED: your WhatsApp number digits only, e.g. 260971234567
+  const paypalMe = ''; // OPTIONAL: set your PayPal.me username if you use PayPal (like 'oliosfoods')
+  const currencySymbol = '$'; // change to 'ZMW' or 'K' if you prefer
+  // ===================================
+
+  function getCart(){ return JSON.parse(localStorage.getItem('olios_cart') || '[]'); }
+  function saveCart(c){ localStorage.setItem('olios_cart', JSON.stringify(c)); updateCartCount(); }
+  function updateCartCount(){
+    const cart = getCart();
+    const count = cart.reduce((s,i)=> s + i.qty, 0);
+    const el = document.getElementById('cart-count');
+    if(el) el.textContent = count;
+  }
+  function formatPrice(n){ return currencySymbol + Number(n || 0).toFixed(2); }
+
+  function addToCart(item){
+    const cart = getCart();
+    const existing = cart.find(i=>i.id === item.id);
+    if(existing) existing.qty += item.qty;
+    else cart.push(item);
+    saveCart(cart);
+    renderCart();
+    // small feedback
+    const btn = event?.target;
+    if(btn){
+      btn.textContent = 'Added ✓';
+      setTimeout(()=> btn.textContent = 'Add to cart', 1200);
+    }
+  }
+
+  function renderCart(){
+    const panel = document.getElementById('cart-panel');
+    const cart = getCart();
+    const list = cart.map(i => `
+      <div class="cart-item">
+        <div>
+          <strong>${escapeHtml(i.name)}</strong>
+          <div style="font-size:.86rem;color:#666">${i.qty} x ${formatPrice(i.price)}</div>
+        </div>
+        <div>${formatPrice(i.price * i.qty)}</div>
+      </div>`).join('');
+    const total = cart.reduce((s,i)=> s + i.price * i.qty, 0);
+    panel.innerHTML = `<h3>Your order</h3>
+      ${cart.length ? list : '<p style="margin:8px 0;color:#666">Cart is empty</p>'}
+      <div style="padding-top:10px;font-weight:700">Total: ${formatPrice(total)}</div>
+      <div class="cart-actions">
+        <button class="btn-whatsapp">Checkout via WhatsApp</button>
+        <button class="btn-paypal">Pay with PayPal</button>
+      </div>
+      <div style="margin-top:10px;text-align:right">
+        <button class="btn-clear">Clear</button>
+        <button id="close-cart" style="margin-left:8px;background:transparent;border:0;color:#666;cursor:pointer">Close</button>
+      </div>`;
+    // wire buttons
+    panel.querySelector('.btn-whatsapp').addEventListener('click', checkoutWhatsApp);
+    panel.querySelector('.btn-paypal').addEventListener('click', ()=> openPayPal(total));
+    panel.querySelector('.btn-clear').addEventListener('click', ()=>{ localStorage.removeItem('olios_cart'); renderCart(); updateCartCount(); });
+    panel.querySelector('#close-cart').addEventListener('click', ()=> panel.style.display='none');
+  }
+
+  function checkoutWhatsApp(){
+    const cart = getCart();
+    if(!cart.length){ alert('Your cart is empty'); return; }
+    if(!sellerPhone || sellerPhone.includes('X')){ alert('Please set your WhatsApp number in the script (sellerPhone).'); return; }
+    const total = cart.reduce((s,i)=> s + i.price * i.qty, 0).toFixed(2);
+    let msg = 'Order from Olios Foods%0A';
+    cart.forEach(i=>{
+      msg += `- ${i.name} x${i.qty} = ${formatPrice(i.price * i.qty)}%0A`;
+    });
+    msg += `%0ATotal: ${currencySymbol}${total}%0A%0AName:%0AAddress:%0APhone:%0ANotes:`;
+    const url = `https://api.whatsapp.com/send?phone=${sellerPhone}&text=${encodeURIComponent(msg)}`;
+    window.open(url,'_blank');
+  }
+
+  function openPayPal(total){
+    if(!paypalMe){ alert('PayPal not set. Set the paypalMe value in the script to enable PayPal checkout.'); return; }
+    const amt = Number(total).toFixed(2);
+    const url = `https://www.paypal.me/${paypalMe}/${amt}`;
+    window.open(url,'_blank');
+  }
+
+  // Escape to avoid injection in innerHTML
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  // initialize cart UI and attach to product buttons
+  function init(){
+    updateCartCount();
+    renderCart();
+    const cartBtn = document.getElementById('cart-button');
+    cartBtn.addEventListener('click', ()=>{
+      const panel = document.getElementById('cart-panel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+      if(panel.style.display === 'block') renderCart();
+    });
+
+    // Attach add-to-cart to any .product elements. Your product markup should include name and price or data attributes.
+    document.querySelectorAll('.product').forEach((prod, idx)=>{
+      const id = prod.dataset.id || ('p'+(idx+1));
+      const name = prod.dataset.name || prod.querySelector('h2')?.innerText?.trim() || 'Product';
+      // look for an element containing price text
+      let priceText = prod.dataset.price || prod.querySelector('.price')?.innerText || prod.querySelector('p.price')?.innerText || '';
+      if(!priceText){
+        // try to find any  number-looking text
+        const p = prod.querySelector('p');
+        priceText = p ? p.innerText : '0';
+      }
+      const price = parseFloat(priceText.replace(/[^0-9\.]/g,'')) || 0;
+      let btn = prod.querySelector('.add-to-cart') || prod.querySelector('button');
+      if(!btn){
+        btn = document.createElement('button');
+        btn.className = 'add-to-cart';
+        btn.textContent = 'Add to cart';
+        prod.appendChild(btn);
+      }
+      btn.addEventListener('click', ()=> addToCart({ id, name, price, qty:1 }));
+    });
+  }
+
+  // run it
+  init();
+})();
+</script>
+<!-- END: Olios simple cart -->
