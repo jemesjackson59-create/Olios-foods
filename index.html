@@ -270,5 +270,55 @@
   // run it
   init();
 })();
+</script><script>
+// === Simple WhatsApp Cart ===
+const cart = [];
+const whatsappNumber = "260976985015"; // <- your WhatsApp number (no +)
+
+// Add to cart
+function addToCart(productName, price) {
+  price = Number(price);
+  cart.push({ productName, price });
+  alert(`${productName} added to cart ✅`);
+  updateCartCount();
+}
+
+// Update floating cart count
+function updateCartCount() {
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.innerText = cart.length;
+}
+
+// Checkout: open WhatsApp with order summary
+function checkout() {
+  if (cart.length === 0) {
+    alert("Your cart is empty 🛒");
+    return;
+  }
+
+  const lines = [];
+  lines.push("🧾 New Order from Olios Foods Website");
+  lines.push("");
+  let total = 0;
+
+  cart.forEach((item, i) => {
+    lines.push(`${i + 1}. ${item.productName} - K${item.price}`);
+    total += Number(item.price);
+  });
+
+  lines.push("");
+  lines.push(`Total: K${total}`);
+  lines.push("");
+  lines.push("Please confirm your order and give delivery address / contact info.");
+
+  const message = encodeURIComponent(lines.join("\n"));
+  const url = `https://wa.me/${whatsappNumber}?text=${message}`;
+  window.open(url, "_blank");
+}
 </script>
+
+<!-- Floating Cart Button -->
+<div onclick="checkout()" style="position:fixed; right:18px; bottom:18px; background:#e63946; color:#fff; border-radius:50px; padding:10px 15px; display:flex; align-items:center; cursor:pointer; z-index:999;">
+  🛍️ <span id="cart-count" style="margin-left:8px;">0</span>
+</div>
 <!-- END: Olios simple cart -->
